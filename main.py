@@ -14,22 +14,20 @@ def send_post_request(url, data):
     return response_data
 
 app_name = None
-command = None
-if len(sys.argv) < 2:
+while True:
     app_name = input('app name: ').strip()
-else:
-    app_name = sys.argv[1]
+    if len(app_name) == 0:
+        print('Invalid app name')
+        continue
+    break
 
-if len(sys.argv) < 3:
+while True:
     command = input('command: ').strip()
-else:
-    command = sys.argv[2]
-
-
-url = f'{SERVER_URL}/cmd'
-data = {
-    'text': f'{app_name} {command}'
-}
-
-response = send_post_request(url, data)
-print(response)
+    if len(command) == 0:
+        print('Invalid command')
+        continue
+    url = f'{SERVER_URL}/cmd'
+    data = { 'text': f'{app_name} {command}' }
+    response = send_post_request(url, data)
+    print('sent')
+    print()
