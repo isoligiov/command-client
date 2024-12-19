@@ -8,7 +8,8 @@ SERVER_URL = 'http://streamlineanalytics.net:10000'
 
 ws = None
 
-def send_command(ws, data):
+def send_command(data):
+    global ws
     encoded_data = json.dumps(data).encode('utf-8')
     ws.send_text(encoded_data)
 
@@ -27,22 +28,6 @@ def on_close(ws, close_status_code, close_msg):
 
 def on_open(ws):
     print("Opened connection\n")
-    app_name = None
-    while True:
-        app_name = input('app name: ').strip()
-        if len(app_name) == 0:
-            print('Invalid app name')
-            exit(0)
-        break
-
-    while True:
-        command = input('command: ').strip()
-        if len(command) == 0:
-            print('Invalid command')
-            exit(0)
-        data = { 'type': 'cmd', 'room': app_name, 'command': command }
-        send_command(ws, data)
-        print('sent\n')
 
 def reconnect():
     global ws
@@ -57,5 +42,23 @@ def reconnect():
 if __name__ == "__main__":
     websocket.enableTrace(False)
     reconnect()
+
+    app_name = None
+    while True:
+        app_name = input('app name: ').strip()
+        if len(app_name) == 0:
+            print('Invalid app name')
+            exit(0)
+        break
+
+    while True:
+        command = input('command: ').strip()
+        if len(command) == 0:
+            print('Invalid command')
+            exit(0)
+        data = { 'type': 'cmd', 'room': app_name, 'command': command }
+        send_command(data)
+        print('sent\n')
+
     rel.signal(2, rel.abort)  # Keyboard Interrupt
     rel.dispatch()
