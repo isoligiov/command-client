@@ -5,7 +5,7 @@ import json
 import time
 import threading
 
-SERVER_URL = 'http://streamlineanalytics.net:10000'
+websocket_server_url = "wss://streamlineanalytics.net:10001"
 
 ws = None
 
@@ -49,15 +49,22 @@ def input_thread():
         send_command(data)
         print('sent\n')
 
+def ws_thread():
+    while True:
+        ws = websocket.WebSocketApp(websocket_server_url,
+                                on_error=on_error,
+                                on_close=on_close,
+                                on_open=on_open)
+
+        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE}, dispatcher=rel, reconnect=5, ping_interval=10, ping_timeout=9)
+        time.sleep(3600 * 3)
+        ws.close()
+
 if __name__ == "__main__":
     websocket.enableTrace(False)
-    ws = websocket.WebSocketApp(f"wss://streamlineanalytics.net:10001",
-                              on_open=on_open,
-                              on_message=on_message,
-                              on_error=on_error,
-                              on_close=on_close)
 
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE}, dispatcher=rel, reconnect=5, ping_interval=10, ping_timeout=9)
+    ws_thread_handler = threading.Thread(target=ws_thread)
+    ws_thread_handler.start()
 
     input_handler = threading.Thread(target=input_thread)
     input_handler.start()
