@@ -57,7 +57,7 @@ if __name__ == "__main__":
                               on_error=on_error,
                               on_close=on_close)
 
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE}, dispatcher=rel, reconnect=5, ping_interval=10)
+    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE}, dispatcher=rel, reconnect=5, ping_interval=10, ping_timeout=9)
 
     input_handler = threading.Thread(target=input_thread)
     input_handler.start()
