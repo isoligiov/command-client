@@ -17,9 +17,6 @@ def send_command(data):
     except:
         print('Error while sending command')
 
-def on_message(ws, message):
-    pass
-
 def on_error(ws, error):
     print(error)
 
