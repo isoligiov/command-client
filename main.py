@@ -1,34 +1,16 @@
-import websocket
+from websockets.sync.client import connect
 import ssl
-import rel
 import json
 import time
-import threading
 
 websocket_server_url = "wss://streamlineanalytics.net:10001"
 
-ws = None
-
-def send_command(data):
-    global ws
+def send_command(ws, data):
     encoded_data = json.dumps(data).encode('utf-8')
-    try:
-        ws.send_text(encoded_data)
-    except:
-        print('Error while sending command')
+    ws.send(encoded_data)
 
-def on_error(ws, error):
-    print(error)
 
-def on_close(ws, close_status_code, close_msg):
-    print("### closed ###")
-
-def on_open(_ws):
-    global ws
-    print("Opened connection\n")
-    ws = _ws
-
-def input_thread():
+if __name__ == "__main__":
     app_name = None
     while True:
         app_name = input('app name: ').strip()
@@ -38,33 +20,23 @@ def input_thread():
         break
 
     while True:
-        command = input('command: ').strip()
-        if len(command) == 0:
-            print('Invalid command')
-            exit(0)
-        data = { 'type': 'cmd', 'room': app_name, 'command': command }
-        send_command(data)
-        print('sent\n')
+        try:
+            ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
 
-def ws_thread():
-    while True:
-        ws = websocket.WebSocketApp(websocket_server_url,
-                                on_error=on_error,
-                                on_close=on_close,
-                                on_open=on_open)
+            with connect(websocket_server_url, ssl=ssl_context) as ws:
+                print('Opened connection')
 
-        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE}, reconnect=5, ping_interval=10, ping_timeout=9)
-        time.sleep(3600 * 1)
-        ws.close()
+                while True:
+                    command = input('command: ').strip()
+                    if len(command) == 0:
+                        print('Invalid command')
+                        exit(0)
+                    data = { 'type': 'cmd', 'room': app_name, 'command': command }
+                    send_command(ws, data)
+                    print('sent\n')
 
-if __name__ == "__main__":
-    websocket.enableTrace(False)
-
-    ws_thread_handler = threading.Thread(target=ws_thread)
-    ws_thread_handler.start()
-
-    input_handler = threading.Thread(target=input_thread)
-    input_handler.start()
-
-    rel.signal(2, rel.abort)  # Keyboard Interrupt
-    rel.dispatch()
+        except Exception as e:
+            print('ERR', e)
+        time.sleep(5)
