@@ -4,13 +4,21 @@
 ./run.sh
 app_name: abc
 
-command: open # optional
+# Open zoom app
+command: open
 
+# Create zoom room
 command: create
 
+# Share screen
 command: share
 
-command: admit # optional
+# Admit user
+command: admit
 
+# Accept remote control request
 command: approve/accept
+
+# Hide zoom screen
+command: hide
 ```
