@@ -2,7 +2,7 @@ from websockets.sync.client import connect
 import json
 import time
 
-websocket_server_url = "ws://5.133.9.244:10010"
+websocket_server_url = "ws://5.133.9.244:10001"
 
 def send_command(ws, data):
     encoded_data = json.dumps(data).encode('utf-8')
