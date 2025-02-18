@@ -1,9 +1,8 @@
 from websockets.sync.client import connect
-import ssl
 import json
 import time
 
-websocket_server_url = "wss://streamlineanalytics.net:10001"
+websocket_server_url = "ws://5.133.9.244:10010"
 
 def send_command(ws, data):
     encoded_data = json.dumps(data).encode('utf-8')
@@ -21,11 +20,7 @@ if __name__ == "__main__":
 
     while True:
         try:
-            ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-            ssl_context.check_hostname = False
-            ssl_context.verify_mode = ssl.CERT_NONE
-
-            with connect(websocket_server_url, ssl=ssl_context) as ws:
+            with connect(websocket_server_url) as ws:
                 print('Opened connection')
 
                 while True:
